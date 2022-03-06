@@ -1,0 +1,43 @@
+name: CMake
+
+on:
+  push:
+    branches:
+      - '**'
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+  pull_request:
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+  release:
+    types: [prereleased]
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+
+    - name: Install MSVC compiler
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        toolset: 14.2
+        arch: x64
+
+    - name: Setup Ninja
+      uses: seanmiddleditch/gha-setup-ninja@v3
+
+    - name: Install Qt
